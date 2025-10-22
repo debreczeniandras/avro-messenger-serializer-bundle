@@ -1,0 +1,37 @@
+framework:
+  test: true
+  http_method_override: false
+  secret: 'test'
+
+charge_cloud_avro_messenger_serializer:
+  schema_dirs:
+    - '%kernel.project_dir%/tests/Fixtures/avro'
+  schema_registry:
+    base_uri: 'http://schema-registry.local'
+    register_missing_schemas: true
+    register_missing_subjects: true
+  messages:
+    ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\ConfiguredMessage:
+      key_subject: 'configured-key'
+      value_subject: 'configured-value'
+      header_provider: 'test.header_provider'
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  test.header_provider:
+    class: ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Messaging\TestHeaderProvider
+
+  ChargeCloud\AvroMessengerSerializerBundle\Messenger\AvroMessengerSerializer: ~
+
+  ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Schema\InMemoryRegistry: ~
+
+  ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Messaging\FakeRecordSerializer: ~
+
+  ChargeCloud\AvroMessengerSerializerBundle\Messenger\RecordEncoder:
+    arguments:
+      $recordSerializer: '@ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Messaging\FakeRecordSerializer'
+      $schemaRepository: '@ChargeCloud\AvroMessengerSerializerBundle\Schema\SchemaRepository'

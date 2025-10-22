@@ -1,0 +1,66 @@
+{
+  "name": "chargecloud/avro-messenger-serializer-bundle",
+  "type": "symfony-bundle",
+  "description": "Symfony bundle providing an Avro serializer for Messenger with Confluent Schema Registry integration.",
+  "license": "MIT",
+  "keywords": [
+    "symfony",
+    "bundle",
+    "messenger",
+    "avro",
+    "kafka",
+    "schema-registry"
+  ],
+  "homepage": "https://www.chargecloud.de",
+  "authors": [
+    {
+      "name": "András Debreczeni",
+      "email": "a.debreczeni@chargecloud.de",
+      "homepage": "https://www.chargecloud.de"
+    }
+  ],
+  "require": {
+    "php": ">=8.3",
+    "symfony/config": "^6.0 || ^7.0",
+    "symfony/dependency-injection": "^6.0 || ^7.0",
+    "symfony/http-kernel": "^6.0 || ^7.0",
+    "symfony/messenger": "^6.0 || ^7.0",
+    "flix-tech/avro-serde-php": "^3.0",
+    "flix-tech/confluent-schema-registry-api": "^8.0",
+    "symfony/finder": "^7.3",
+    "symfony/framework-bundle": "^7.3",
+    "symfony/yaml": "^7.3"
+  },
+  "require-dev": {
+    "symfony/serializer": "^6.0 || ^7.0",
+    "symfony/phpunit-bridge": "*",
+    "friendsofphp/php-cs-fixer": "^3.89"
+  },
+  "autoload": {
+    "psr-4": {
+      "ChargeCloud\\AvroMessengerSerializerBundle\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "ChargeCloud\\AvroMessengerSerializerBundle\\Tests\\": "tests/"
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "scripts": {
+    "cs:fix": "php-cs-fixer fix",
+    "cs:check": "php-cs-fixer fix --dry-run --diff",
+    "phpunit": "./vendor/bin/simple-phpunit",
+    "tests": [
+      "@phpunit",
+      "@cs:check"
+    ]
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-main": "0.0.x-dev"
+    },
+    "schema-path": "schema"
+  }
+}

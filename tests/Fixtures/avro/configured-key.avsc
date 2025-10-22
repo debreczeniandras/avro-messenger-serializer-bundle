@@ -1,0 +1,8 @@
+{
+  "type": "record",
+  "name": "ConfiguredKey",
+  "namespace": "ChargeCloud.Tests",
+  "fields": [
+    {"name": "id", "type": "string"}
+  ]
+}
