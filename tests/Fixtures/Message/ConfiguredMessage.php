@@ -14,6 +14,18 @@ final class ConfiguredMessage implements AvroMessageInterface
     ) {
     }
 
+    public function eventId(): ?string
+    {
+        $id = $this->value['id'] ?? $this->key['id'] ?? null;
+
+        return \is_scalar($id) ? (string) $id : null;
+    }
+
+    public function eventType(): ?string
+    {
+        return self::class;
+    }
+
     public static function fromAvroPayload(?array $keyPayload, ?array $valuePayload): AvroMessageInterface
     {
         return new self($keyPayload ?? [], $valuePayload);

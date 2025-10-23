@@ -72,6 +72,16 @@ final class CustomerUpdated implements AvroMessageInterface
     ) {
     }
 
+    public function eventId(): ?string
+    {
+        return $this->payload['event_id'] ?? $this->key['id'] ?? null;
+    }
+
+    public function eventType(): ?string
+    {
+        return 'customer.updated';
+    }
+
     public static function fromAvroPayload(?array $keyPayload, ?array $valuePayload): self
     {
         return new self($keyPayload ?? [], $valuePayload ?? []);
@@ -88,6 +98,8 @@ final class CustomerUpdated implements AvroMessageInterface
     }
 }
 ```
+
+`eventId()` and `eventType()` expose optional CloudEvents-inspired metadata that header providers can re-use when building transport headers.
 
 `fromAvroPayload()` is used during decoding. Return `null` from `avroValuePayload()` to emit tombstone messages when the serializer encounters a nullable value subject.
 
@@ -149,6 +161,8 @@ final class CustomerHeaderProvider implements HeaderProviderInterface
     {
         return [
             'ce_specversion' => '1.0',
+            'ce_id' => $message->eventId() ?? bin2hex(random_bytes(16)),
+            'ce_type' => $message->eventType() ?? $message::class,
             'producer' => 'my-service',
         ];
     }
