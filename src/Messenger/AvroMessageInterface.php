@@ -30,14 +30,14 @@ interface AvroMessageInterface
     /**
      * Structured data that should be encoded into the Avro key record.
      *
-     * @return array<string, mixed>|null Returning null skips key serialization for the message.
+     * @return array<string, mixed>|null returning null skips key serialization for the message
      */
     public function avroKeyPayload(): ?array;
 
     /**
      * Structured data that should be encoded into the Avro value record.
      *
-     * @return array<string, mixed>|null Returning null marks the message as a tombstone.
+     * @return array<string, mixed>|null returning null marks the message as a tombstone
      */
     public function avroValuePayload(): ?array;
 

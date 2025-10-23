@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChargeCloud\AvroMessengerSerializerBundle\Schema;
 
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 final class SchemaLoader
 {
@@ -17,6 +18,8 @@ final class SchemaLoader
     }
 
     /**
+     * Build a map of subject name to Avro schema by scanning configured directories.
+     *
      * @return array<string, \AvroSchema>
      */
     public function load(): array
@@ -45,7 +48,7 @@ final class SchemaLoader
             }
 
             $decoded = $this->decodeSchemaJson($contents, (string) $file);
-            $subjects = $this->deriveSubjects($file->getBasename('.avsc'), $decoded);
+            $subjects = $this->deriveSubjects($file, $decoded);
 
             foreach (array_unique($subjects) as $subject) {
                 if ('' === $subject) {
@@ -60,6 +63,8 @@ final class SchemaLoader
     }
 
     /**
+     * Keep only directories that exist at runtime to avoid filesystem errors.
+     *
      * @param array<array-key, string> $directories
      *
      * @return string[]
@@ -73,6 +78,8 @@ final class SchemaLoader
     }
 
     /**
+     * Decode schema JSON into an associative array while surfacing parsing issues.
+     *
      * @return array<string, mixed>
      */
     private function decodeSchemaJson(string $contents, string $filePath): array
@@ -91,17 +98,26 @@ final class SchemaLoader
     }
 
     /**
+     * Derive all viable subject names for a schema, merging explicit hints with conventions.
+     *
      * @param array<string, mixed> $decoded
      *
      * @return string[]
      */
-    private function deriveSubjects(string $basename, array $decoded): array
+    private function deriveSubjects(SplFileInfo $file, array $decoded): array
     {
-        $subjects = [$basename];
+        $basename = $file->getBasename('.avsc');
+        $subjects = [$basename]; // allow direct lookups by filename without the extension
 
         $subjectFromSchema = $decoded['subject'] ?? null;
         if (\is_string($subjectFromSchema) && '' !== $subjectFromSchema) {
             $subjects[] = $subjectFromSchema;
+        }
+
+        $namespace = $decoded['namespace'] ?? null;
+        $directorySubject = $this->subjectFromDirectory($file, \is_string($namespace) ? $namespace : null, $basename);
+        if (null !== $directorySubject && '' !== $directorySubject) {
+            $subjects[] = $directorySubject; // folder-based convention (e.g. namespace.folder-basename)
         }
 
         $name = $decoded['name'] ?? null;
@@ -109,7 +125,6 @@ final class SchemaLoader
             return $subjects;
         }
 
-        $namespace = $decoded['namespace'] ?? null;
         if (\is_string($namespace) && '' !== $namespace) {
             $subjects[] = \sprintf('%s.%s', $namespace, $name);
         }
@@ -117,5 +132,33 @@ final class SchemaLoader
         $subjects[] = $name;
 
         return $subjects;
+    }
+
+    /**
+     * Create a subject name from the schema's relative directory and optional namespace.
+     */
+    private function subjectFromDirectory(SplFileInfo $file, ?string $namespace, string $basename): ?string
+    {
+        $relativePath = $file->getRelativePath();
+
+        if (null === $relativePath || '' === $relativePath) {
+            return null;
+        }
+
+        $pathSegments = preg_split('~[\\\\/]+~', $relativePath, -1, \PREG_SPLIT_NO_EMPTY);
+        if (false === $pathSegments || [] === $pathSegments) {
+            return null;
+        }
+
+        $segment = (string) array_pop($pathSegments); // last directory contains the logical subject name
+        if ('' === $segment) {
+            return null;
+        }
+
+        if (null !== $namespace && '' !== $namespace) {
+            return \sprintf('%s.%s-%s', $namespace, $segment, $basename);
+        }
+
+        return \sprintf('%s-%s', $segment, $basename);
     }
 }

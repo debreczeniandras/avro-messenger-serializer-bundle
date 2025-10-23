@@ -1,0 +1,8 @@
+{
+  "type": "record",
+  "namespace": "ocpi.queue.session",
+  "name": "PositionUpdatedKey",
+  "fields": [
+    { "name": "session_id", "type": "string" }
+  ]
+}

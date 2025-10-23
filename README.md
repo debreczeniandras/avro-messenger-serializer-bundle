@@ -183,3 +183,21 @@ config/
 ```
 
 Each `.avsc` schema is parsed and registered with the Confluent Schema Registry when the serializer encodes a message. Ensure the subjects in your tag configuration match the expected Schema Registry subjects or leave `value_subject` empty to allow tombstones.
+
+### Subject naming conventions
+
+`SchemaLoader` derives candidate subject names in the following order and keeps all valid options:
+
+1. Base filename without the `.avsc` suffix (e.g. `key`, `value`).
+2. Explicit `"subject"` declared inside the schema JSON.
+3. `<namespace>.<folder>-<basename>` when the file lives inside nested directories.
+4. `<namespace>.<name>` and `<name>` whenever both fields exist.
+
+You can structure your schemas so the folder name encodes the logical subject stem. For example:
+
+| Folder path           | Filename     | `namespace`          | `name`               | Derived subjects (in order)                                                                                     |
+|-----------------------|--------------|----------------------|----------------------|-----------------------------------------------------------------------------------------------------------------|
+| `…/position-updated/` | `key.avsc`   | `ocpi.queue.session` | `PositionUpdatedKey` | `key`, `ocpi.queue.session.position-updated-key`, `ocpi.queue.session.PositionUpdatedKey`, `PositionUpdatedKey` |
+| `…/position-updated/` | `value.avsc` | `ocpi.queue.session` | `PositionUpdated`    | `value`, `ocpi.queue.session.position-updated-value`, `ocpi.queue.session.PositionUpdated`, `PositionUpdated`   |
+
+The Confluent Schema Registry will receive subjects such as `ocpi.queue.session.position-updated-key` and `ocpi.queue.session.position-updated-value` when using the layout shown above.
