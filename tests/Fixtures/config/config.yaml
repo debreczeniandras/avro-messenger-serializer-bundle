@@ -6,6 +6,7 @@ framework:
 charge_cloud_avro_messenger_serializer:
   schema_dirs:
     - '%kernel.project_dir%/tests/Fixtures/avro'
+    - '%kernel.project_dir%/tests/Fixtures/schema'
   schema_registry:
     base_uri: 'http://schema-registry.local'
     register_missing_schemas: true

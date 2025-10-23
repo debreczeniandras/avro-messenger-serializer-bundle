@@ -17,7 +17,6 @@ final class AvroMessengerSerializer implements SerializerInterface
     private const HEADER_KEY_SUBJECT = 'x-chargecloud-avro-key-subject';
     private const HEADER_VALUE_SUBJECT = 'x-chargecloud-avro-value-subject';
     private const HEADER_CLASS = 'x-chargecloud-avro-class';
-    private const HEADER_KEY_PAYLOAD = 'x-chargecloud-avro-key';
     private const HEADER_TOMBSTONE = 'x-chargecloud-avro-tombstone';
 
     public function __construct(
@@ -29,7 +28,7 @@ final class AvroMessengerSerializer implements SerializerInterface
     }
 
     /**
-     * @return array{body: string, headers: array<string, mixed>}
+     * @return array{body: string, headers: array<string, mixed>, key: ?string}
      */
     public function encode(Envelope $envelope): array
     {
@@ -57,7 +56,6 @@ final class AvroMessengerSerializer implements SerializerInterface
         if (null !== $keySubject && null !== $keyPayload) {
             $encodedKey = $this->recordEncoder->encode($keySubject, $keyPayload);
             $headers[self::HEADER_KEY_SUBJECT] = $keySubject;
-            $headers[self::HEADER_KEY_PAYLOAD] = base64_encode($encodedKey);
         }
 
         $valueSubject = $metadata->valueSubject();
@@ -84,6 +82,7 @@ final class AvroMessengerSerializer implements SerializerInterface
         return [
             'body' => $body,
             'headers' => $headers,
+            'key' => $encodedKey,
         ];
     }
 
@@ -115,12 +114,12 @@ final class AvroMessengerSerializer implements SerializerInterface
         }
 
         $binaryKey = null;
-        if (isset($headers[self::HEADER_KEY_PAYLOAD]) && \is_string($headers[self::HEADER_KEY_PAYLOAD])) {
-            $binaryKey = base64_decode($headers[self::HEADER_KEY_PAYLOAD], true);
-
-            if (false === $binaryKey) {
-                throw new MessageDecodingFailedException('Failed to decode base64 encoded key payload.');
+        if (\array_key_exists('key', $encodedEnvelope)) {
+            if (null !== $encodedEnvelope['key'] && !\is_string($encodedEnvelope['key'])) {
+                throw new MessageDecodingFailedException('Encoded key must be a string or null.');
             }
+
+            $binaryKey = $encodedEnvelope['key'];
         }
 
         $keyPayload = null;
