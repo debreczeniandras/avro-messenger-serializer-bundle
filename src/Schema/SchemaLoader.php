@@ -107,8 +107,6 @@ final class SchemaLoader
     private function deriveSubjects(SplFileInfo $file, array $decoded): array
     {
         $basename = $file->getBasename('.avsc');
-        $subjects = [$basename]; // allow direct lookups by filename without the extension
-
         $subjectFromSchema = $decoded['subject'] ?? null;
         if (\is_string($subjectFromSchema) && '' !== $subjectFromSchema) {
             $subjects[] = $subjectFromSchema;
@@ -128,8 +126,6 @@ final class SchemaLoader
         if (\is_string($namespace) && '' !== $namespace) {
             $subjects[] = \sprintf('%s.%s', $namespace, $name);
         }
-
-        $subjects[] = $name;
 
         return $subjects;
     }

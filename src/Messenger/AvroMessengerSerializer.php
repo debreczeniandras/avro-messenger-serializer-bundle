@@ -60,7 +60,7 @@ final class AvroMessengerSerializer implements SerializerInterface
 
         $valueSubject = $metadata->valueSubject();
         $valuePayload = $message->avroValuePayload();
-        $body = '';
+        $body = null;
         $isTombstone = false;
 
         if (null === $valueSubject) {
