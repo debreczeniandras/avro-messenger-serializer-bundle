@@ -18,8 +18,8 @@ final class MessageMetadataRegistryTest extends TestCase
             ConfiguredMessage::class => [
                 'service_id' => 'service',
                 'class' => ConfiguredMessage::class,
-                'key_subject' => 'configured-key',
-                'value_subject' => 'configured-value',
+                'key_subject' => 'ChargeCloud.Tests.ConfiguredKey',
+                'value_subject' => 'ChargeCloud.Tests.ConfiguredValue',
                 'header_provider' => null,
             ],
         ]);
@@ -27,8 +27,8 @@ final class MessageMetadataRegistryTest extends TestCase
         $metadata = $registry->get(ConfiguredMessage::class);
 
         self::assertInstanceOf(MessageMetadata::class, $metadata);
-        self::assertSame('configured-key', $metadata->keySubject());
-        self::assertSame('configured-value', $metadata->valueSubject());
+        self::assertSame('ChargeCloud.Tests.ConfiguredKey', $metadata->keySubject());
+        self::assertSame('ChargeCloud.Tests.ConfiguredValue', $metadata->valueSubject());
     }
 
     public function testResolvesFromAttribute(): void
@@ -38,7 +38,7 @@ final class MessageMetadataRegistryTest extends TestCase
         $metadata = $registry->get(AttributeMessage::class);
 
         self::assertInstanceOf(MessageMetadata::class, $metadata);
-        self::assertSame('attribute-key', $metadata->keySubject());
-        self::assertSame('attribute-value', $metadata->valueSubject());
+        self::assertSame('ChargeCloud.Tests.AttributeKey', $metadata->keySubject());
+        self::assertSame('ChargeCloud.Tests.AttributeValue', $metadata->valueSubject());
     }
 }

@@ -13,8 +13,8 @@ charge_cloud_avro_messenger_serializer:
     register_missing_subjects: true
   messages:
     ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\ConfiguredMessage:
-      key_subject: 'configured-key'
-      value_subject: 'configured-value'
+      key_subject: 'ChargeCloud.Tests.ConfiguredKey'
+      value_subject: 'ChargeCloud.Tests.ConfiguredValue'
       header_provider: 'test.header_provider'
 
 services:

@@ -52,8 +52,8 @@ final class AvroMessengerSerializerTest extends KernelTestCase
 
         self::assertArrayHasKey('body', $encoded);
         self::assertArrayHasKey('headers', $encoded);
-        self::assertSame('configured-value', $encoded['headers']['x-chargecloud-avro-value-subject']);
-        self::assertSame('configured-key', $encoded['headers']['x-chargecloud-avro-key-subject']);
+        self::assertSame('ChargeCloud.Tests.ConfiguredValue', $encoded['headers']['x-chargecloud-avro-value-subject']);
+        self::assertSame('ChargeCloud.Tests.ConfiguredKey', $encoded['headers']['x-chargecloud-avro-key-subject']);
         self::assertSame('value', $encoded['headers']['test-header']);
 
         $decodedEnvelope = $this->serializer->decode($encoded);
@@ -74,7 +74,7 @@ final class AvroMessengerSerializerTest extends KernelTestCase
         $encoded = $this->serializer->encode($envelope);
 
         self::assertSame('1', $encoded['headers']['x-chargecloud-avro-tombstone']);
-        self::assertSame('', $encoded['body']);
+        self::assertNull($encoded['body']);
 
         $decodedEnvelope = $this->serializer->decode($encoded);
 
@@ -89,16 +89,16 @@ final class AvroMessengerSerializerTest extends KernelTestCase
         $message = new AttributeMessage(['id' => 'key-2'], ['id' => 'value-2', 'status' => 'ok']);
         $envelope = new Envelope($message);
 
-        self::assertTrue($this->schemaRepository->has('attribute-value'));
-        self::assertTrue($this->schemaRepository->has('attribute-key'));
+        self::assertTrue($this->schemaRepository->has('ChargeCloud.Tests.AttributeValue'));
+        self::assertTrue($this->schemaRepository->has('ChargeCloud.Tests.AttributeKey'));
         $metadata = $this->metadataRegistry->get(AttributeMessage::class);
         self::assertNotNull($metadata);
-        self::assertSame('attribute-value', $metadata->valueSubject());
-        self::assertStringContainsString('AttributeValue', (string) $this->schemaRepository->get('attribute-value'));
+        self::assertSame('ChargeCloud.Tests.AttributeValue', $metadata->valueSubject());
+        self::assertStringContainsString('AttributeValue', (string) $this->schemaRepository->get('ChargeCloud.Tests.AttributeValue'));
 
         $encoded = $this->serializer->encode($envelope);
 
-        self::assertSame('attribute-value', $encoded['headers']['x-chargecloud-avro-value-subject']);
+        self::assertSame('ChargeCloud.Tests.AttributeValue', $encoded['headers']['x-chargecloud-avro-value-subject']);
 
         $decodedEnvelope = $this->serializer->decode($encoded);
         /** @var AttributeMessage $decodedMessage */

@@ -7,7 +7,10 @@ namespace ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message;
 use ChargeCloud\AvroMessengerSerializerBundle\Attribute\AsAvroMessage;
 use ChargeCloud\AvroMessengerSerializerBundle\Messenger\AvroMessageInterface;
 
-#[AsAvroMessage(keySubject: 'attribute-key', valueSubject: 'attribute-value')]
+#[AsAvroMessage(
+    keySubject: 'ChargeCloud.Tests.AttributeKey',
+    valueSubject: 'ChargeCloud.Tests.AttributeValue'
+)]
 final class AttributeMessage implements AvroMessageInterface
 {
     public function __construct(
