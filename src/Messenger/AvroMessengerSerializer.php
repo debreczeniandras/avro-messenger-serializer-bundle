@@ -14,10 +14,10 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 final class AvroMessengerSerializer implements SerializerInterface
 {
     private const HEADER_TYPE = 'type';
-    private const HEADER_KEY_SUBJECT = 'x-Chargecloud-avro-key-subject';
-    private const HEADER_VALUE_SUBJECT = 'x-Chargecloud-avro-value-subject';
-    private const HEADER_CLASS = 'x-Chargecloud-avro-class';
-    private const HEADER_TOMBSTONE = 'x-Chargecloud-avro-tombstone';
+    private const HEADER_KEY_SUBJECT = 'x-avro-key-subject';
+    private const HEADER_VALUE_SUBJECT = 'x-avro-value-subject';
+    private const HEADER_CLASS = 'x-avro-class';
+    private const HEADER_TOMBSTONE = 'x-is-tombstone';
 
     public function __construct(
         private readonly MessageMetadataRegistry $metadataRegistry,

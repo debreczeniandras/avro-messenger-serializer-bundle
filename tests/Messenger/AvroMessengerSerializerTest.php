@@ -52,8 +52,8 @@ final class AvroMessengerSerializerTest extends KernelTestCase
 
         self::assertArrayHasKey('body', $encoded);
         self::assertArrayHasKey('headers', $encoded);
-        self::assertSame('Chargecloud.Tests.ConfiguredValue', $encoded['headers']['x-Chargecloud-avro-value-subject']);
-        self::assertSame('Chargecloud.Tests.ConfiguredKey', $encoded['headers']['x-Chargecloud-avro-key-subject']);
+        self::assertSame('Chargecloud.Tests.ConfiguredValue', $encoded['headers']['x-avro-value-subject']);
+        self::assertSame('Chargecloud.Tests.ConfiguredKey', $encoded['headers']['x-avro-key-subject']);
         self::assertSame('value', $encoded['headers']['test-header']);
 
         $decodedEnvelope = $this->serializer->decode($encoded);
@@ -73,7 +73,7 @@ final class AvroMessengerSerializerTest extends KernelTestCase
 
         $encoded = $this->serializer->encode($envelope);
 
-        self::assertSame('1', $encoded['headers']['x-Chargecloud-avro-tombstone']);
+        self::assertSame('1', $encoded['headers']['x-is-tombstone']);
         self::assertNull($encoded['body']);
 
         $decodedEnvelope = $this->serializer->decode($encoded);
@@ -98,7 +98,7 @@ final class AvroMessengerSerializerTest extends KernelTestCase
 
         $encoded = $this->serializer->encode($envelope);
 
-        self::assertSame('Chargecloud.Tests.AttributeValue', $encoded['headers']['x-Chargecloud-avro-value-subject']);
+        self::assertSame('Chargecloud.Tests.AttributeValue', $encoded['headers']['x-avro-value-subject']);
 
         $decodedEnvelope = $this->serializer->decode($encoded);
         /** @var AttributeMessage $decodedMessage */
@@ -120,7 +120,7 @@ final class AvroMessengerSerializerTest extends KernelTestCase
 
         $encoded = $this->serializer->encode($envelope);
 
-        self::assertSame('ocpi.queue.session.position-updated-key', $encoded['headers']['x-Chargecloud-avro-key-subject'] ?? null);
+        self::assertSame('ocpi.queue.session.position-updated-key', $encoded['headers']['x-avro-key-subject'] ?? null);
         self::assertArrayHasKey('key', $encoded);
         self::assertIsString($encoded['key']);
 

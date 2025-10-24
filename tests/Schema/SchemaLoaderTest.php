@@ -11,7 +11,7 @@ final class SchemaLoaderTest extends TestCase
 {
     public function testDerivesSubjectFromDirectoryStructure(): void
     {
-        $directory = __DIR__.'/../Fixtures/schema';
+        $directory = __DIR__.'/../Fixtures/config/schema';
         $loader = new SchemaLoader([$directory]);
 
         $schemas = $loader->load();
