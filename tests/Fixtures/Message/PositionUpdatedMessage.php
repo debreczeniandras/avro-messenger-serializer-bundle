@@ -46,4 +46,3 @@ final class PositionUpdatedMessage implements AvroMessageInterface
         return $this->value;
     }
 }
-
