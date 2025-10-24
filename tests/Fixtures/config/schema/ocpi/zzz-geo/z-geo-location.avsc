@@ -1,0 +1,9 @@
+{
+  "type": "record",
+  "namespace": "ocpi",
+  "name": "GeoLocation",
+  "fields": [
+    { "name": "latitude", "type": "double" },
+    { "name": "longitude", "type": "double" }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "type": "record",
+  "namespace": "ocpi",
+  "name": "ChargingLocation",
+  "references": [
+    "ocpi.GeoLocation"
+  ],
+  "fields": [
+    { "name": "location_id", "type": "string" },
+    {
+      "name": "coordinates",
+      "type": [
+        "null",
+        "ocpi.GeoLocation"
+      ],
+      "default": null
+    }
+  ]
+}
