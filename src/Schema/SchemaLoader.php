@@ -24,100 +24,37 @@ final class SchemaLoader
      */
     public function load(): array
     {
-        $schemas = [];
         $directories = $this->filterExistingDirectories($this->directories);
 
         if ([] === $directories) {
-            return $schemas;
+            return [];
         }
 
         $finder = new Finder();
         $finder->files()->in($directories)->name('*.avsc');
 
-        $schemaEntries = [];
-        $subjectIndex = [];
-
-        foreach ($finder as $file) {
-            $contents = $file->getContents();
-
-            if ('' === $contents) {
-                continue;
-            }
-
-            $decoded = $this->decodeSchemaJson($contents, (string) $file);
-            $references = $this->extractReferences($decoded, (string) $file);
-            unset($decoded['references']);
-
-            $subjects = $this->deriveSubjects($file, $decoded);
-            $subjects = array_values(array_unique(array_filter(
-                $subjects ?? [],
-                static fn ($subject): bool => \is_string($subject) && '' !== $subject
-            )));
-
-            $schemaEntries[] = [
-                'file' => $file,
-                'definition' => $decoded,
-                'references' => $references,
-                'subjects' => $subjects,
-            ];
-
-            $entryIndex = \count($schemaEntries) - 1;
-
-            foreach ($subjects as $subject) {
-                $subjectIndex[$subject] = $entryIndex;
-            }
-        }
+        $schemaEntries = $this->collectSchemaEntries($finder);
 
         if ([] === $schemaEntries) {
-            return $schemas;
+            return [];
         }
 
+        $subjectIndex = $this->buildSubjectIndex($schemaEntries);
         $namedSchemata = new \AvroNamedSchemata();
-        $loading = [];
-        $loaded = [];
-
-        $loadEntry = function (int $index) use (&$loadEntry, &$schemaEntries, &$schemas, &$subjectIndex, &$namedSchemata, &$loading, &$loaded): void {
-            if (isset($loaded[$index])) {
-                return;
-            }
-
-            if (isset($loading[$index])) {
-                $path = $schemaEntries[$index]['file']->getRealPath() ?: (string) $schemaEntries[$index]['file'];
-                throw new \RuntimeException(\sprintf('Circular schema reference detected while loading "%s".', $path));
-            }
-
-            $loading[$index] = true;
-            $entry = $schemaEntries[$index];
-
-            foreach ($entry['references'] as $referenceSubject) {
-                if (!isset($subjectIndex[$referenceSubject])) {
-                    $path = $entry['file']->getRealPath() ?: (string) $entry['file'];
-                    throw new \RuntimeException(\sprintf('Schema "%s" references unknown subject "%s".', $path, $referenceSubject));
-                }
-
-                $loadEntry($subjectIndex[$referenceSubject]);
-            }
-
-            try {
-                $schema = \AvroSchema::real_parse($entry['definition'], null, $namedSchemata);
-            } catch (\AvroSchemaParseException $exception) {
-                $path = $entry['file']->getRealPath() ?: (string) $entry['file'];
-                throw new \RuntimeException(\sprintf('Failed to parse Avro schema "%s": %s', $path, $exception->getMessage()), 0, $exception);
-            } catch (\Throwable $exception) {
-                $path = $entry['file']->getRealPath() ?: (string) $entry['file'];
-                throw new \RuntimeException(\sprintf('Failed to parse Avro schema "%s": %s', $path, $exception->getMessage()), 0, $exception);
-            }
-
-            foreach ($entry['subjects'] as $subject) {
-                $schemas[$subject] = $schema;
-            }
-
-            $loaded[$index] = true;
-            unset($loading[$index]);
-        };
+        $schemas = [];
+        $resolving = [];
+        $resolved = [];
 
         foreach (\array_keys($schemaEntries) as $index) {
-            $loadEntry((int) $index);
+            $this->ensureEntryLoaded(
+                (int) $index,
+                $schemaEntries,
+                $subjectIndex,
+                $namedSchemata,
+                $schemas,
+                $resolving,
+                $resolved
+            );
         }
 
         return $schemas;
@@ -189,6 +126,192 @@ final class SchemaLoader
         }
 
         return $subjects;
+    }
+
+    /**
+     * Collect schema metadata for every discovered `.avsc` file.
+     *
+     * @return array<int, array{file: SplFileInfo, definition: array<string, mixed>, references: string[], subjects: string[], full_name: ?string}>
+     */
+    private function collectSchemaEntries(Finder $finder): array
+    {
+        $entries = [];
+
+        foreach ($finder as $file) {
+            $contents = $file->getContents();
+
+            if ('' === $contents) {
+                continue;
+            }
+
+            $decoded = $this->decodeSchemaJson($contents, (string) $file);
+            $references = $this->extractReferences($decoded, (string) $file);
+            unset($decoded['references']);
+
+            $subjects = $this->deriveSubjects($file, $decoded);
+            $subjects = array_values(array_unique(array_filter(
+                $subjects ?? [],
+                static fn ($subject): bool => \is_string($subject) && '' !== $subject
+            )));
+
+            $entries[] = [
+                'file' => $file,
+                'definition' => $decoded,
+                'references' => $references,
+                'subjects' => $subjects,
+                'full_name' => $this->resolveFullName($decoded),
+            ];
+        }
+
+        return $entries;
+    }
+
+    /**
+     * Build a lookup of subject name to schema entry index.
+     *
+     * @param array<int, array{subjects: string[]}> $schemaEntries
+     *
+     * @return array<string, int>
+     */
+    private function buildSubjectIndex(array $schemaEntries): array
+    {
+        $index = [];
+
+        foreach ($schemaEntries as $entryIndex => $entry) {
+            foreach ($entry['subjects'] as $subject) {
+                $index[$subject] = (int) $entryIndex;
+            }
+        }
+
+        return $index;
+    }
+
+    /**
+     * Ensure a schema entry (and its dependencies) is parsed and cached.
+     *
+     * @param array<int, array{file: SplFileInfo, definition: array<string, mixed>, references: string[], subjects: string[], full_name: ?string}> $schemaEntries
+     * @param array<string, int> $subjectIndex
+     * @param array<string, \AvroSchema> $schemas
+     * @param array<int, bool> $resolving
+     * @param array<int, bool> $resolved
+     */
+    private function ensureEntryLoaded(
+        int $index,
+        array $schemaEntries,
+        array $subjectIndex,
+        \AvroNamedSchemata &$namedSchemata,
+        array &$schemas,
+        array &$resolving,
+        array &$resolved
+    ): void {
+        if (isset($resolved[$index])) {
+            return;
+        }
+
+        if (isset($resolving[$index])) {
+            $path = $schemaEntries[$index]['file']->getRealPath() ?: (string) $schemaEntries[$index]['file'];
+
+            throw new \RuntimeException(\sprintf('Circular schema reference detected while loading "%s".', $path));
+        }
+
+        $resolving[$index] = true;
+        $entry = $schemaEntries[$index];
+
+        foreach ($entry['references'] as $referenceSubject) {
+            if (!isset($subjectIndex[$referenceSubject])) {
+                $path = $entry['file']->getRealPath() ?: (string) $entry['file'];
+
+                throw new \RuntimeException(\sprintf('Schema "%s" references unknown subject "%s".', $path, $referenceSubject));
+            }
+
+            $this->ensureEntryLoaded(
+                $subjectIndex[$referenceSubject],
+                $schemaEntries,
+                $subjectIndex,
+                $namedSchemata,
+                $schemas,
+                $resolving,
+                $resolved
+            );
+        }
+
+        $schema = $this->resolveOrParseSchema(
+            $entry['definition'],
+            $entry['file'],
+            $entry['full_name'],
+            $namedSchemata
+        );
+
+        foreach ($entry['subjects'] as $subject) {
+            $schemas[$subject] = $schema;
+        }
+
+        $resolved[$index] = true;
+        unset($resolving[$index]);
+    }
+
+    /**
+     * Parse a schema definition while sharing named schema state.
+     *
+     * @param array<string, mixed> $definition
+     */
+    private function resolveOrParseSchema(array $definition, SplFileInfo $file, ?string $fullName, \AvroNamedSchemata &$namedSchemata): \AvroSchema
+    {
+        if (null !== $fullName && $namedSchemata->has_name($fullName)) {
+            $existing = $namedSchemata->schema($fullName);
+
+            if (null !== $existing) {
+                return $existing;
+            }
+        }
+
+        try {
+            return \AvroSchema::real_parse($definition, null, $namedSchemata);
+        } catch (\AvroSchemaParseException $exception) {
+            if (null !== $fullName && $namedSchemata->has_name($fullName)) {
+                $existing = $namedSchemata->schema($fullName);
+
+                if (null !== $existing) {
+                    return $existing;
+                }
+            }
+
+            $path = $file->getRealPath() ?: (string) $file;
+
+            throw new \RuntimeException(\sprintf('Failed to parse Avro schema "%s": %s', $path, $exception->getMessage()), 0, $exception);
+        } catch (\Throwable $exception) {
+            $path = $file->getRealPath() ?: (string) $file;
+
+            throw new \RuntimeException(\sprintf('Failed to parse Avro schema "%s": %s', $path, $exception->getMessage()), 0, $exception);
+        }
+    }
+
+    /**
+     * Resolve the fully qualified Avro name if available.
+     *
+     * @param array<string, mixed> $decoded
+     */
+    private function resolveFullName(array $decoded): ?string
+    {
+        $name = $decoded['name'] ?? null;
+
+        if (!\is_string($name) || '' === $name) {
+            return null;
+        }
+
+        $namespace = $decoded['namespace'] ?? null;
+
+        try {
+            $avroName = new \AvroName(
+                $name,
+                \is_string($namespace) && '' !== $namespace ? $namespace : null,
+                null
+            );
+        } catch (\Throwable $exception) {
+            return null;
+        }
+
+        return $avroName->fullname();
     }
 
     /**

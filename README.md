@@ -201,3 +201,27 @@ You can structure your schemas so the folder name encodes the logical subject st
 | `…/position-updated/` | `value.avsc` | `ocpi.queue.session` | `PositionUpdated`    | `value`, `ocpi.queue.session.position-updated-value`, `ocpi.queue.session.PositionUpdated`, `PositionUpdated`   |
 
 The Confluent Schema Registry will receive subjects such as `ocpi.queue.session.position-updated-key` and `ocpi.queue.session.position-updated-value` when using the layout shown above.
+
+### Schema references
+
+When one schema depends on another (for example a nullable union that embeds a shared record), add a top-level `references` array to declare the subject names that must be resolved first:
+
+```json
+{
+  "type": "record",
+  "namespace": "ocpi",
+  "name": "ChargingLocation",
+  "references": [
+    "ocpi.GeoLocation"
+  ],
+  "fields": [
+    {
+      "name": "coordinates",
+      "type": ["null", "ocpi.GeoLocation"],
+      "default": null
+    }
+  ]
+}
+```
+
+The bundle uses these hints to load schemas in dependency order so cross-file references work regardless of discovery order. The declared subjects can also be forwarded to `\FlixTech\SchemaRegistryApi\Registry\CachedRegistry::register()` as Avro references to make the relationship explicit in the Confluent Schema Registry.
