@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\Schema;
+namespace Chargecloud\AvroMessengerSerializerBundle\Schema;
 
 final class SchemaRepository
 {

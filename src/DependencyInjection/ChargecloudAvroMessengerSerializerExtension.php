@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\DependencyInjection;
+namespace Chargecloud\AvroMessengerSerializerBundle\DependencyInjection;
 
-use ChargeCloud\AvroMessengerSerializerBundle\DependencyInjection\Compiler\MessageMetadataCompilerPass;
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\AvroMessengerSerializer;
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\HeaderProviderInterface;
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\MessageMetadataRegistry;
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\RecordEncoder;
-use ChargeCloud\AvroMessengerSerializerBundle\Schema\SchemaLoader;
-use ChargeCloud\AvroMessengerSerializerBundle\Schema\SchemaRepository;
+use Chargecloud\AvroMessengerSerializerBundle\DependencyInjection\Compiler\MessageMetadataCompilerPass;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\AvroMessengerSerializer;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\HeaderProviderInterface;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\MessageMetadataRegistry;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\RecordEncoder;
+use Chargecloud\AvroMessengerSerializerBundle\Schema\SchemaLoader;
+use Chargecloud\AvroMessengerSerializerBundle\Schema\SchemaRepository;
 use FlixTech\AvroSerializer\Objects\RecordSerializer;
 use FlixTech\SchemaRegistryApi\Registry\BlockingRegistry;
 use FlixTech\SchemaRegistryApi\Registry\Cache\AvroObjectCacheAdapter;
@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Reference;
 
-final class ChargeCloudAvroMessengerSerializerExtension extends Extension
+final class ChargecloudAvroMessengerSerializerExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container): void
     {
@@ -32,10 +32,10 @@ final class ChargeCloudAvroMessengerSerializerExtension extends Extension
         $container->registerForAutoconfiguration(HeaderProviderInterface::class)
             ->addTag(MessageMetadataCompilerPass::HEADER_PROVIDER_TAG);
 
-        $container->setParameter('charge_cloud_avro_messenger_serializer.schema_dirs', $config['schema_dirs']);
-        $container->setParameter('charge_cloud_avro_messenger_serializer.register_missing_schemas', $config['schema_registry']['register_missing_schemas']);
-        $container->setParameter('charge_cloud_avro_messenger_serializer.register_missing_subjects', $config['schema_registry']['register_missing_subjects']);
-        $container->setParameter('charge_cloud_avro_messenger_serializer.message_metadata', $this->normalizeConfiguredMessages($config['messages'] ?? []));
+        $container->setParameter('chargecloud_avro_messenger_serializer.schema_dirs', $config['schema_dirs']);
+        $container->setParameter('chargecloud_avro_messenger_serializer.register_missing_schemas', $config['schema_registry']['register_missing_schemas']);
+        $container->setParameter('chargecloud_avro_messenger_serializer.register_missing_subjects', $config['schema_registry']['register_missing_subjects']);
+        $container->setParameter('chargecloud_avro_messenger_serializer.message_metadata', $this->normalizeConfiguredMessages($config['messages'] ?? []));
 
         $this->registerHttpClient($container, $config);
         $this->registerSchemaRegistry($container, $config);
@@ -48,7 +48,7 @@ final class ChargeCloudAvroMessengerSerializerExtension extends Extension
         $clientDefinition = (new Definition(Client::class))
             ->setArgument('$config', $this->createHttpClientConfig($config));
 
-        $container->setDefinition('charge_cloud_avro_messenger_serializer.http_client', $clientDefinition);
+        $container->setDefinition('chargecloud_avro_messenger_serializer.http_client', $clientDefinition);
     }
 
     private function createHttpClientConfig(array $config): array
@@ -73,20 +73,20 @@ final class ChargeCloudAvroMessengerSerializerExtension extends Extension
     private function registerSchemaRegistry(ContainerBuilder $container, array $config): void
     {
         $promising = (new Definition(PromisingRegistry::class))
-            ->setArgument('$client', new Reference('charge_cloud_avro_messenger_serializer.http_client'));
-        $container->setDefinition('charge_cloud_avro_messenger_serializer.registry.promising', $promising);
+            ->setArgument('$client', new Reference('chargecloud_avro_messenger_serializer.http_client'));
+        $container->setDefinition('chargecloud_avro_messenger_serializer.registry.promising', $promising);
 
         $blocking = (new Definition(BlockingRegistry::class))
-            ->setArgument('$registry', new Reference('charge_cloud_avro_messenger_serializer.registry.promising'));
-        $container->setDefinition('charge_cloud_avro_messenger_serializer.registry.blocking', $blocking);
+            ->setArgument('$registry', new Reference('chargecloud_avro_messenger_serializer.registry.promising'));
+        $container->setDefinition('chargecloud_avro_messenger_serializer.registry.blocking', $blocking);
 
         $cachedRegistry = (new Definition(CachedRegistry::class))
-            ->setArgument('$registry', new Reference('charge_cloud_avro_messenger_serializer.registry.blocking'))
+            ->setArgument('$registry', new Reference('chargecloud_avro_messenger_serializer.registry.blocking'))
             ->setArgument('$cacheAdapter', new Definition(AvroObjectCacheAdapter::class));
-        $container->setDefinition('charge_cloud_avro_messenger_serializer.registry.cached', $cachedRegistry);
+        $container->setDefinition('chargecloud_avro_messenger_serializer.registry.cached', $cachedRegistry);
 
         $recordSerializer = (new Definition(RecordSerializer::class))
-            ->setArgument('$registry', new Reference('charge_cloud_avro_messenger_serializer.registry.cached'))
+            ->setArgument('$registry', new Reference('chargecloud_avro_messenger_serializer.registry.cached'))
             ->setArgument('$options', [
                 RecordSerializer::OPTION_REGISTER_MISSING_SCHEMAS => $config['schema_registry']['register_missing_schemas'],
                 RecordSerializer::OPTION_REGISTER_MISSING_SUBJECTS => $config['schema_registry']['register_missing_subjects'],
@@ -97,7 +97,7 @@ final class ChargeCloudAvroMessengerSerializerExtension extends Extension
     private function registerSchemaInfrastructure(ContainerBuilder $container): void
     {
         $schemaLoader = (new Definition(SchemaLoader::class))
-            ->setArgument('$directories', '%charge_cloud_avro_messenger_serializer.schema_dirs%');
+            ->setArgument('$directories', '%chargecloud_avro_messenger_serializer.schema_dirs%');
         $container->setDefinition(SchemaLoader::class, $schemaLoader);
 
         $schemaRepository = (new Definition(SchemaRepository::class))
@@ -110,7 +110,7 @@ final class ChargeCloudAvroMessengerSerializerExtension extends Extension
         $container->setDefinition(RecordEncoder::class, $recordEncoder);
 
         $metadataRegistry = (new Definition(MessageMetadataRegistry::class))
-            ->setArgument('$rawMetadata', '%charge_cloud_avro_messenger_serializer.message_metadata%');
+            ->setArgument('$rawMetadata', '%chargecloud_avro_messenger_serializer.message_metadata%');
         $container->setDefinition(MessageMetadataRegistry::class, $metadataRegistry);
     }
 
@@ -125,7 +125,7 @@ final class ChargeCloudAvroMessengerSerializerExtension extends Extension
         $serializer->setPublic(true);
 
         $container->setDefinition(AvroMessengerSerializer::class, $serializer);
-        $container->setAlias('charge_cloud_avro_messenger_serializer.serializer', AvroMessengerSerializer::class)->setPublic(true);
+        $container->setAlias('chargecloud_avro_messenger_serializer.serializer', AvroMessengerSerializer::class)->setPublic(true);
     }
 
     /**

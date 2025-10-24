@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\Messenger;
+namespace Chargecloud\AvroMessengerSerializerBundle\Messenger;
 
-use ChargeCloud\AvroMessengerSerializerBundle\Attribute\AsAvroMessage;
+use Chargecloud\AvroMessengerSerializerBundle\Attribute\AsAvroMessage;
 
 final class MessageMetadataRegistry
 {

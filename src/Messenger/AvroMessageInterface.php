@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\Messenger;
+namespace Chargecloud\AvroMessengerSerializerBundle\Messenger;
 
 /**
  * Contract for messages that can be serialized through the Avro messenger serializer.

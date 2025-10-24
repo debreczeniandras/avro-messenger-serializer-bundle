@@ -38,12 +38,12 @@
   },
   "autoload": {
     "psr-4": {
-      "ChargeCloud\\AvroMessengerSerializerBundle\\": "src/"
+      "Chargecloud\\AvroMessengerSerializerBundle\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "ChargeCloud\\AvroMessengerSerializerBundle\\Tests\\": "tests/"
+      "Chargecloud\\AvroMessengerSerializerBundle\\Tests\\": "tests/"
     }
   },
   "minimum-stability": "stable",
@@ -56,6 +56,9 @@
       "@phpunit",
       "@cs:check"
     ]
+  },
+  "config": {
+    "sort-packages": true
   },
   "extra": {
     "branch-alias": {

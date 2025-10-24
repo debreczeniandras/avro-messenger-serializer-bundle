@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\Tests;
+namespace Chargecloud\AvroMessengerSerializerBundle\Tests;
 
-use ChargeCloud\AvroMessengerSerializerBundle\ChargeCloudAvroMessengerSerializerBundle;
+use Chargecloud\AvroMessengerSerializerBundle\ChargecloudAvroMessengerSerializerBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -19,7 +19,7 @@ final class Kernel extends BaseKernel
     {
         return [
             new FrameworkBundle(),
-            new ChargeCloudAvroMessengerSerializerBundle(),
+            new ChargecloudAvroMessengerSerializerBundle(),
         ];
     }
 

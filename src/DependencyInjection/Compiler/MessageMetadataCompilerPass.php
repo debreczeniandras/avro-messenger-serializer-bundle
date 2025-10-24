@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\DependencyInjection\Compiler;
+namespace Chargecloud\AvroMessengerSerializerBundle\DependencyInjection\Compiler;
 
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\AvroMessengerSerializer;
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\HeaderProviderInterface;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\AvroMessengerSerializer;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\HeaderProviderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -13,16 +13,16 @@ use Symfony\Component\DependencyInjection\Reference;
 
 final class MessageMetadataCompilerPass implements CompilerPassInterface
 {
-    public const TAG = 'chargecloud.avro_messenger_serializer.message_serializer';
-    public const HEADER_PROVIDER_TAG = 'chargecloud.avro_messenger_serializer.header_provider';
+    public const TAG = 'Chargecloud.avro_messenger_serializer.message_serializer';
+    public const HEADER_PROVIDER_TAG = 'Chargecloud.avro_messenger_serializer.header_provider';
 
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasParameter('charge_cloud_avro_messenger_serializer.message_metadata')) {
+        if (!$container->hasParameter('chargecloud_avro_messenger_serializer.message_metadata')) {
             return;
         }
 
-        $metadata = $container->getParameter('charge_cloud_avro_messenger_serializer.message_metadata');
+        $metadata = $container->getParameter('chargecloud_avro_messenger_serializer.message_metadata');
 
         if (!\is_array($metadata)) {
             $metadata = [];
@@ -130,7 +130,7 @@ final class MessageMetadataCompilerPass implements CompilerPassInterface
             }
         }
 
-        $container->setParameter('charge_cloud_avro_messenger_serializer.message_metadata', $metadata);
+        $container->setParameter('chargecloud_avro_messenger_serializer.message_metadata', $metadata);
 
         if ($container->hasDefinition(AvroMessengerSerializer::class)) {
             $serializerDefinition = $container->getDefinition(AvroMessengerSerializer::class);

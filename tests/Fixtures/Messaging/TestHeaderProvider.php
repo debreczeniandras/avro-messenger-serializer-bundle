@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Messaging;
+namespace Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Messaging;
 
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\AvroMessageInterface;
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\HeaderProviderInterface;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\AvroMessageInterface;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\HeaderProviderInterface;
 
 final class TestHeaderProvider implements HeaderProviderInterface
 {

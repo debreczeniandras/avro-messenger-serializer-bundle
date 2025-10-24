@@ -7,14 +7,14 @@
          failOnRisky="true"
 >
     <testsuites>
-        <testsuite name="ChargeCloud Avro Messenger Serializer Bundle Tests">
+        <testsuite name="Chargecloud Avro Messenger Serializer Bundle Tests">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
     <php>
         <ini name="error_reporting" value="-1"/>
         <ini name="display_errors" value="1"/>
-        <env name="KERNEL_CLASS" value="ChargeCloud\AvroMessengerSerializerBundle\Tests\Kernel"/>
+        <env name="KERNEL_CLASS" value="Chargecloud\AvroMessengerSerializerBundle\Tests\Kernel"/>
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>
     </php>
 </phpunit>

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message;
+namespace Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message;
 
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\AvroMessageInterface;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\AvroMessageInterface;
 
 final class ConfiguredMessage implements AvroMessageInterface
 {

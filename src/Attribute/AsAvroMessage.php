@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\Attribute;
+namespace Chargecloud\AvroMessengerSerializerBundle\Attribute;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class AsAvroMessage

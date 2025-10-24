@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Schema;
+namespace Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Schema;
 
 use FlixTech\SchemaRegistryApi\Exception\SchemaNotFoundException;
 use FlixTech\SchemaRegistryApi\Exception\SubjectNotFoundException;

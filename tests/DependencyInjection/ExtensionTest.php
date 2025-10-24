@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\Tests\DependencyInjection;
+namespace Chargecloud\AvroMessengerSerializerBundle\Tests\DependencyInjection;
 
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\AvroMessengerSerializer;
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\MessageMetadataRegistry;
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\RecordEncoder;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\AvroMessengerSerializer;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\MessageMetadataRegistry;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\RecordEncoder;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 final class ExtensionTest extends KernelTestCase

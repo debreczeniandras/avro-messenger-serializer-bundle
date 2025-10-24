@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message;
+namespace Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message;
 
-use ChargeCloud\AvroMessengerSerializerBundle\Attribute\AsAvroMessage;
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\AvroMessageInterface;
+use Chargecloud\AvroMessengerSerializerBundle\Attribute\AsAvroMessage;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\AvroMessageInterface;
 
 #[AsAvroMessage(
-    keySubject: 'ChargeCloud.Tests.AttributeKey',
-    valueSubject: 'ChargeCloud.Tests.AttributeValue'
+    keySubject: 'Chargecloud.Tests.AttributeKey',
+    valueSubject: 'Chargecloud.Tests.AttributeValue'
 )]
 final class AttributeMessage implements AvroMessageInterface
 {

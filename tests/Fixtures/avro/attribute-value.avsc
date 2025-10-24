@@ -1,7 +1,7 @@
 {
   "type": "record",
   "name": "AttributeValue",
-  "namespace": "ChargeCloud.Tests",
+  "namespace": "Chargecloud.Tests",
   "fields": [
     {"name": "id", "type": "string"},
     {"name": "status", "type": "string"}

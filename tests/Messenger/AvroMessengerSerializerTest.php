@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\Tests\Messenger;
+namespace Chargecloud\AvroMessengerSerializerBundle\Tests\Messenger;
 
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\AvroMessengerSerializer;
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\MessageMetadataRegistry;
-use ChargeCloud\AvroMessengerSerializerBundle\Schema\SchemaRepository;
-use ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\AttributeMessage;
-use ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\ConfiguredMessage;
-use ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\PositionUpdatedMessage;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\AvroMessengerSerializer;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\MessageMetadataRegistry;
+use Chargecloud\AvroMessengerSerializerBundle\Schema\SchemaRepository;
+use Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\AttributeMessage;
+use Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\ConfiguredMessage;
+use Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\PositionUpdatedMessage;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Messenger\Envelope;
 
@@ -52,8 +52,8 @@ final class AvroMessengerSerializerTest extends KernelTestCase
 
         self::assertArrayHasKey('body', $encoded);
         self::assertArrayHasKey('headers', $encoded);
-        self::assertSame('ChargeCloud.Tests.ConfiguredValue', $encoded['headers']['x-chargecloud-avro-value-subject']);
-        self::assertSame('ChargeCloud.Tests.ConfiguredKey', $encoded['headers']['x-chargecloud-avro-key-subject']);
+        self::assertSame('Chargecloud.Tests.ConfiguredValue', $encoded['headers']['x-Chargecloud-avro-value-subject']);
+        self::assertSame('Chargecloud.Tests.ConfiguredKey', $encoded['headers']['x-Chargecloud-avro-key-subject']);
         self::assertSame('value', $encoded['headers']['test-header']);
 
         $decodedEnvelope = $this->serializer->decode($encoded);
@@ -73,7 +73,7 @@ final class AvroMessengerSerializerTest extends KernelTestCase
 
         $encoded = $this->serializer->encode($envelope);
 
-        self::assertSame('1', $encoded['headers']['x-chargecloud-avro-tombstone']);
+        self::assertSame('1', $encoded['headers']['x-Chargecloud-avro-tombstone']);
         self::assertNull($encoded['body']);
 
         $decodedEnvelope = $this->serializer->decode($encoded);
@@ -89,16 +89,16 @@ final class AvroMessengerSerializerTest extends KernelTestCase
         $message = new AttributeMessage(['id' => 'key-2'], ['id' => 'value-2', 'status' => 'ok']);
         $envelope = new Envelope($message);
 
-        self::assertTrue($this->schemaRepository->has('ChargeCloud.Tests.AttributeValue'));
-        self::assertTrue($this->schemaRepository->has('ChargeCloud.Tests.AttributeKey'));
+        self::assertTrue($this->schemaRepository->has('Chargecloud.Tests.AttributeValue'));
+        self::assertTrue($this->schemaRepository->has('Chargecloud.Tests.AttributeKey'));
         $metadata = $this->metadataRegistry->get(AttributeMessage::class);
         self::assertNotNull($metadata);
-        self::assertSame('ChargeCloud.Tests.AttributeValue', $metadata->valueSubject());
-        self::assertStringContainsString('AttributeValue', (string) $this->schemaRepository->get('ChargeCloud.Tests.AttributeValue'));
+        self::assertSame('Chargecloud.Tests.AttributeValue', $metadata->valueSubject());
+        self::assertStringContainsString('AttributeValue', (string) $this->schemaRepository->get('Chargecloud.Tests.AttributeValue'));
 
         $encoded = $this->serializer->encode($envelope);
 
-        self::assertSame('ChargeCloud.Tests.AttributeValue', $encoded['headers']['x-chargecloud-avro-value-subject']);
+        self::assertSame('Chargecloud.Tests.AttributeValue', $encoded['headers']['x-Chargecloud-avro-value-subject']);
 
         $decodedEnvelope = $this->serializer->decode($encoded);
         /** @var AttributeMessage $decodedMessage */
@@ -120,7 +120,7 @@ final class AvroMessengerSerializerTest extends KernelTestCase
 
         $encoded = $this->serializer->encode($envelope);
 
-        self::assertSame('ocpi.queue.session.position-updated-key', $encoded['headers']['x-chargecloud-avro-key-subject'] ?? null);
+        self::assertSame('ocpi.queue.session.position-updated-key', $encoded['headers']['x-Chargecloud-avro-key-subject'] ?? null);
         self::assertArrayHasKey('key', $encoded);
         self::assertIsString($encoded['key']);
 

@@ -1,11 +1,11 @@
-# ChargeCloud Avro Messenger Serializer Bundle
+# Chargecloud Avro Messenger Serializer Bundle
 
 A Symfony bundle that integrates the [flix-tech/avro-serde-php](https://github.com/flix-tech/avro-serde-php) serializer and the [Confluent Schema Registry API](https://github.com/flix-tech/confluent-schema-registry-api) to provide Avro-based serialization for Symfony Messenger messages with automatic schema registration and validation.
 
 ## Installation
 
 ```bash
-composer require chargecloud/avro-messenger-serializer-bundle
+composer require Chargecloud/avro-messenger-serializer-bundle
 ```
 
 Add the bundle to `config/bundles.php` when not using Symfony Flex:
@@ -13,7 +13,7 @@ Add the bundle to `config/bundles.php` when not using Symfony Flex:
 ```php
 return [
     // ...
-    ChargeCloud\AvroMessengerSerializerBundle\ChargeCloudAvroMessengerSerializerBundle::class => ['all' => true],
+    Chargecloud\AvroMessengerSerializerBundle\ChargecloudAvroMessengerSerializerBundle::class => ['all' => true],
 ];
 ```
 
@@ -26,10 +26,10 @@ make tests  # runs phpunit followed by php-cs-fixer in dry-run mode
 
 ## Configuration
 
-Create `config/packages/charge_cloud_avro_messenger_serializer.yaml`:
+Create `config/packages/chargecloud_avro_messenger_serializer.yaml`:
 
 ```yaml
-charge_cloud_avro_messenger_serializer:
+chargecloud_avro_messenger_serializer:
   schema_dirs:
     - '%kernel.project_dir%/config/avro'
   schema_registry:
@@ -59,10 +59,10 @@ charge_cloud_avro_messenger_serializer:
 
 ## Declaring Messages
 
-Messages that should be serialized must implement `ChargeCloud\AvroMessengerSerializerBundle\Messenger\AvroMessageInterface`:
+Messages that should be serialized must implement `Chargecloud\AvroMessengerSerializerBundle\Messenger\AvroMessageInterface`:
 
 ```php
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\AvroMessageInterface;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\AvroMessageInterface;
 
 final class CustomerUpdated implements AvroMessageInterface
 {
@@ -110,10 +110,10 @@ Register the provided serializer service; Messenger will use the configuration m
 ```yaml
 # config/services.yaml
 services:
-  ChargeCloud\AvroMessengerSerializerBundle\Messenger\AvroMessengerSerializer: ~
+  Chargecloud\AvroMessengerSerializerBundle\Messenger\AvroMessengerSerializer: ~
 ```
 
-Point your Messenger transport to the alias `charge_cloud_avro_messenger_serializer.serializer` (set by the bundle) or directly to the serializer service id:
+Point your Messenger transport to the alias `chargecloud_avro_messenger_serializer.serializer` (set by the bundle) or directly to the serializer service id:
 
 ```yaml
 # config/packages/messenger.yaml
@@ -122,12 +122,12 @@ framework:
     transports:
       kafka:
         dsn: '%env(KAFKA_TRANSPORT_DSN)%'
-        serializer: 'charge_cloud_avro_messenger_serializer.serializer'
+        serializer: 'chargecloud_avro_messenger_serializer.serializer'
 ```
 
 Multiple messages can be declared by listing them under the `messages` configuration. Inheritance and interface metadata are supported; the registry will walk parent classes and interfaces when resolving metadata.
 
-> **Advanced:** When you register additional serializer services (for example, separate services per transport), continue using the `chargecloud.avro_messenger_serializer.message_serializer` tag on those services to override or extend the configuration. The tag accepts the same `class_name`, `key_subject`, `value_subject`, and optional `header_provider` attributes. Header providers declared as services are automatically tagged with `chargecloud.avro_messenger_serializer.header_provider`.
+> **Advanced:** When you register additional serializer services (for example, separate services per transport), continue using the `Chargecloud.avro_messenger_serializer.message_serializer` tag on those services to override or extend the configuration. The tag accepts the same `class_name`, `key_subject`, `value_subject`, and optional `header_provider` attributes. Header providers declared as services are automatically tagged with `Chargecloud.avro_messenger_serializer.header_provider`.
 
 ### Attribute-based metadata
 
@@ -135,8 +135,8 @@ Instead of configuring each message, you can annotate the DTO with the provided 
 
 ```php
 use App\Infrastructure\Kafka\Headers\CustomerHeaderProvider;
-use ChargeCloud\AvroMessengerSerializerBundle\Attribute\AsAvroMessage;
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\AvroMessageInterface;
+use Chargecloud\AvroMessengerSerializerBundle\Attribute\AsAvroMessage;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\AvroMessageInterface;
 
 #[AsAvroMessage(keySubject: 'customer-key', valueSubject: 'customer-value', headerProvider: CustomerHeaderProvider::class)]
 final class CustomerUpdated implements AvroMessageInterface
@@ -149,11 +149,11 @@ Leave `valueSubject` at its default (`null`) to allow tombstone messages to be e
 
 ### Custom headers
 
-Implement `ChargeCloud\AvroMessengerSerializerBundle\Messenger\HeaderProviderInterface` when you need to add CloudEvents metadata or tracing headers:
+Implement `Chargecloud\AvroMessengerSerializerBundle\Messenger\HeaderProviderInterface` when you need to add CloudEvents metadata or tracing headers:
 
 ```php
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\AvroMessageInterface;
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\HeaderProviderInterface;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\AvroMessageInterface;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\HeaderProviderInterface;
 
 final class CustomerHeaderProvider implements HeaderProviderInterface
 {

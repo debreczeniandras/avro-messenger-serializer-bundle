@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\Tests\Messenger;
+namespace Chargecloud\AvroMessengerSerializerBundle\Tests\Messenger;
 
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\MessageMetadata;
-use ChargeCloud\AvroMessengerSerializerBundle\Messenger\MessageMetadataRegistry;
-use ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\AttributeMessage;
-use ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\ConfiguredMessage;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\MessageMetadata;
+use Chargecloud\AvroMessengerSerializerBundle\Messenger\MessageMetadataRegistry;
+use Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\AttributeMessage;
+use Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\ConfiguredMessage;
 use PHPUnit\Framework\TestCase;
 
 final class MessageMetadataRegistryTest extends TestCase
@@ -18,8 +18,8 @@ final class MessageMetadataRegistryTest extends TestCase
             ConfiguredMessage::class => [
                 'service_id' => 'service',
                 'class' => ConfiguredMessage::class,
-                'key_subject' => 'ChargeCloud.Tests.ConfiguredKey',
-                'value_subject' => 'ChargeCloud.Tests.ConfiguredValue',
+                'key_subject' => 'Chargecloud.Tests.ConfiguredKey',
+                'value_subject' => 'Chargecloud.Tests.ConfiguredValue',
                 'header_provider' => null,
             ],
         ]);
@@ -27,8 +27,8 @@ final class MessageMetadataRegistryTest extends TestCase
         $metadata = $registry->get(ConfiguredMessage::class);
 
         self::assertInstanceOf(MessageMetadata::class, $metadata);
-        self::assertSame('ChargeCloud.Tests.ConfiguredKey', $metadata->keySubject());
-        self::assertSame('ChargeCloud.Tests.ConfiguredValue', $metadata->valueSubject());
+        self::assertSame('Chargecloud.Tests.ConfiguredKey', $metadata->keySubject());
+        self::assertSame('Chargecloud.Tests.ConfiguredValue', $metadata->valueSubject());
     }
 
     public function testResolvesFromAttribute(): void
@@ -38,7 +38,7 @@ final class MessageMetadataRegistryTest extends TestCase
         $metadata = $registry->get(AttributeMessage::class);
 
         self::assertInstanceOf(MessageMetadata::class, $metadata);
-        self::assertSame('ChargeCloud.Tests.AttributeKey', $metadata->keySubject());
-        self::assertSame('ChargeCloud.Tests.AttributeValue', $metadata->valueSubject());
+        self::assertSame('Chargecloud.Tests.AttributeKey', $metadata->keySubject());
+        self::assertSame('Chargecloud.Tests.AttributeValue', $metadata->valueSubject());
     }
 }

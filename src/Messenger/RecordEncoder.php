@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\Messenger;
+namespace Chargecloud\AvroMessengerSerializerBundle\Messenger;
 
-use ChargeCloud\AvroMessengerSerializerBundle\Schema\SchemaRepository;
+use Chargecloud\AvroMessengerSerializerBundle\Schema\SchemaRepository;
 use FlixTech\AvroSerializer\Objects\RecordSerializer;
 
 final class RecordEncoder

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Messaging;
+namespace Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Messaging;
 
-use ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Schema\InMemoryRegistry;
+use Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Schema\InMemoryRegistry;
 use FlixTech\AvroSerializer\Objects\RecordSerializer;
 
 final class FakeRecordSerializer extends RecordSerializer

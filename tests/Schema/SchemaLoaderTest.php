@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\Tests\Schema;
+namespace Chargecloud\AvroMessengerSerializerBundle\Tests\Schema;
 
-use ChargeCloud\AvroMessengerSerializerBundle\Schema\SchemaLoader;
+use Chargecloud\AvroMessengerSerializerBundle\Schema\SchemaLoader;
 use PHPUnit\Framework\TestCase;
 
 final class SchemaLoaderTest extends TestCase

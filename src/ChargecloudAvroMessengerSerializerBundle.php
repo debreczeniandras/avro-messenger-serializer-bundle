@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle;
+namespace Chargecloud\AvroMessengerSerializerBundle;
 
-use ChargeCloud\AvroMessengerSerializerBundle\DependencyInjection\Compiler\MessageMetadataCompilerPass;
+use Chargecloud\AvroMessengerSerializerBundle\DependencyInjection\Compiler\MessageMetadataCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-final class ChargeCloudAvroMessengerSerializerBundle extends Bundle
+final class ChargecloudAvroMessengerSerializerBundle extends Bundle
 {
     public function build(ContainerBuilder $container): void
     {

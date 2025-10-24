@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChargeCloud\AvroMessengerSerializerBundle\Messenger;
+namespace Chargecloud\AvroMessengerSerializerBundle\Messenger;
 
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -14,10 +14,10 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 final class AvroMessengerSerializer implements SerializerInterface
 {
     private const HEADER_TYPE = 'type';
-    private const HEADER_KEY_SUBJECT = 'x-chargecloud-avro-key-subject';
-    private const HEADER_VALUE_SUBJECT = 'x-chargecloud-avro-value-subject';
-    private const HEADER_CLASS = 'x-chargecloud-avro-class';
-    private const HEADER_TOMBSTONE = 'x-chargecloud-avro-tombstone';
+    private const HEADER_KEY_SUBJECT = 'x-Chargecloud-avro-key-subject';
+    private const HEADER_VALUE_SUBJECT = 'x-Chargecloud-avro-value-subject';
+    private const HEADER_CLASS = 'x-Chargecloud-avro-class';
+    private const HEADER_TOMBSTONE = 'x-Chargecloud-avro-tombstone';
 
     public function __construct(
         private readonly MessageMetadataRegistry $metadataRegistry,

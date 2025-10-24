@@ -3,7 +3,7 @@ framework:
   http_method_override: false
   secret: 'test'
 
-charge_cloud_avro_messenger_serializer:
+chargecloud_avro_messenger_serializer:
   schema_dirs:
     - '%kernel.project_dir%/tests/Fixtures/avro'
     - '%kernel.project_dir%/tests/Fixtures/schema'
@@ -12,9 +12,9 @@ charge_cloud_avro_messenger_serializer:
     register_missing_schemas: true
     register_missing_subjects: true
   messages:
-    ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\ConfiguredMessage:
-      key_subject: 'ChargeCloud.Tests.ConfiguredKey'
-      value_subject: 'ChargeCloud.Tests.ConfiguredValue'
+    Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\ConfiguredMessage:
+      key_subject: 'Chargecloud.Tests.ConfiguredKey'
+      value_subject: 'Chargecloud.Tests.ConfiguredValue'
       header_provider: 'test.header_provider'
 
 services:
@@ -24,15 +24,15 @@ services:
     public: true
 
   test.header_provider:
-    class: ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Messaging\TestHeaderProvider
+    class: Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Messaging\TestHeaderProvider
 
-  ChargeCloud\AvroMessengerSerializerBundle\Messenger\AvroMessengerSerializer: ~
+  Chargecloud\AvroMessengerSerializerBundle\Messenger\AvroMessengerSerializer: ~
 
-  ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Schema\InMemoryRegistry: ~
+  Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Schema\InMemoryRegistry: ~
 
-  ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Messaging\FakeRecordSerializer: ~
+  Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Messaging\FakeRecordSerializer: ~
 
-  ChargeCloud\AvroMessengerSerializerBundle\Messenger\RecordEncoder:
+  Chargecloud\AvroMessengerSerializerBundle\Messenger\RecordEncoder:
     arguments:
-      $recordSerializer: '@ChargeCloud\AvroMessengerSerializerBundle\Tests\Fixtures\Messaging\FakeRecordSerializer'
-      $schemaRepository: '@ChargeCloud\AvroMessengerSerializerBundle\Schema\SchemaRepository'
+      $recordSerializer: '@Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Messaging\FakeRecordSerializer'
+      $schemaRepository: '@Chargecloud\AvroMessengerSerializerBundle\Schema\SchemaRepository'
