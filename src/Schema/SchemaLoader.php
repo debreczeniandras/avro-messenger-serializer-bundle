@@ -9,6 +9,12 @@ use Symfony\Component\Finder\SplFileInfo;
 
 final class SchemaLoader
 {
+    /** @var array<string, string[]> */
+    private array $referencesBySubject = [];
+
+    /** @var array<string, string> */
+    private array $fullNamesBySubject = [];
+
     /**
      * @param string[] $directories
      */
@@ -24,6 +30,9 @@ final class SchemaLoader
      */
     public function load(): array
     {
+        $this->referencesBySubject = [];
+        $this->fullNamesBySubject = [];
+
         $directories = $this->filterExistingDirectories($this->directories);
 
         if ([] === $directories) {
@@ -40,21 +49,28 @@ final class SchemaLoader
         }
 
         $subjectIndex = $this->buildSubjectIndex($schemaEntries);
+        $loadOrder = $this->resolveLoadOrder($schemaEntries, $subjectIndex);
         $namedSchemata = new \AvroNamedSchemata();
         $schemas = [];
-        $resolving = [];
-        $resolved = [];
 
-        foreach (\array_keys($schemaEntries) as $index) {
-            $this->ensureEntryLoaded(
-                (int) $index,
-                $schemaEntries,
-                $subjectIndex,
-                $namedSchemata,
-                $schemas,
-                $resolving,
-                $resolved
+        foreach ($loadOrder as $index) {
+            $entry = $schemaEntries[$index];
+
+            $schema = $this->resolveOrParseSchema(
+                $entry['definition'],
+                $entry['file'],
+                $entry['full_name'],
+                $namedSchemata
             );
+
+            foreach ($entry['subjects'] as $subject) {
+                $schemas[$subject] = $schema;
+                $this->referencesBySubject[$subject] = $entry['references'];
+
+                if (null !== $entry['full_name']) {
+                    $this->fullNamesBySubject[$subject] = $entry['full_name'];
+                }
+            }
         }
 
         return $schemas;
@@ -129,6 +145,22 @@ final class SchemaLoader
     }
 
     /**
+     * @return array<string, string[]>
+     */
+    public function references(): array
+    {
+        return $this->referencesBySubject;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function fullNames(): array
+    {
+        return $this->fullNamesBySubject;
+    }
+
+    /**
      * Collect schema metadata for every discovered `.avsc` file.
      *
      * @return array<int, array{file: SplFileInfo, definition: array<string, mixed>, references: string[], subjects: string[], full_name: ?string}>
@@ -149,6 +181,12 @@ final class SchemaLoader
             unset($decoded['references']);
 
             $subjects = $this->deriveSubjects($file, $decoded);
+            $fullName = $this->resolveFullName($decoded);
+
+            if (null !== $fullName) {
+                $subjects[] = $fullName;
+            }
+
             $subjects = array_values(array_unique(array_filter(
                 $subjects ?? [],
                 static fn ($subject): bool => \is_string($subject) && '' !== $subject
@@ -159,7 +197,7 @@ final class SchemaLoader
                 'definition' => $decoded,
                 'references' => $references,
                 'subjects' => $subjects,
-                'full_name' => $this->resolveFullName($decoded),
+                'full_name' => $fullName,
             ];
         }
 
@@ -187,67 +225,53 @@ final class SchemaLoader
     }
 
     /**
-     * Ensure a schema entry (and its dependencies) is parsed and cached.
+     * Determine a load order that honours declared references while detecting cycles.
      *
      * @param array<int, array{file: SplFileInfo, definition: array<string, mixed>, references: string[], subjects: string[], full_name: ?string}> $schemaEntries
-     * @param array<string, int> $subjectIndex
-     * @param array<string, \AvroSchema> $schemas
-     * @param array<int, bool> $resolving
-     * @param array<int, bool> $resolved
+     * @param array<string, int>                                                                                                                   $subjectIndex
+     *
+     * @return int[]
      */
-    private function ensureEntryLoaded(
-        int $index,
-        array $schemaEntries,
-        array $subjectIndex,
-        \AvroNamedSchemata &$namedSchemata,
-        array &$schemas,
-        array &$resolving,
-        array &$resolved
-    ): void {
-        if (isset($resolved[$index])) {
-            return;
-        }
+    private function resolveLoadOrder(array $schemaEntries, array $subjectIndex): array
+    {
+        $order = [];
+        $visited = [];
+        $visiting = [];
 
-        if (isset($resolving[$index])) {
-            $path = $schemaEntries[$index]['file']->getRealPath() ?: (string) $schemaEntries[$index]['file'];
-
-            throw new \RuntimeException(\sprintf('Circular schema reference detected while loading "%s".', $path));
-        }
-
-        $resolving[$index] = true;
-        $entry = $schemaEntries[$index];
-
-        foreach ($entry['references'] as $referenceSubject) {
-            if (!isset($subjectIndex[$referenceSubject])) {
-                $path = $entry['file']->getRealPath() ?: (string) $entry['file'];
-
-                throw new \RuntimeException(\sprintf('Schema "%s" references unknown subject "%s".', $path, $referenceSubject));
+        $visit = function (int $index) use (&$visit, $schemaEntries, $subjectIndex, &$order, &$visited, &$visiting): void {
+            if (isset($visited[$index])) {
+                return;
             }
 
-            $this->ensureEntryLoaded(
-                $subjectIndex[$referenceSubject],
-                $schemaEntries,
-                $subjectIndex,
-                $namedSchemata,
-                $schemas,
-                $resolving,
-                $resolved
-            );
+            if (isset($visiting[$index])) {
+                $path = $schemaEntries[$index]['file']->getRealPath() ?: (string) $schemaEntries[$index]['file'];
+
+                throw new \RuntimeException(\sprintf('Circular schema reference detected while loading "%s".', $path));
+            }
+
+            $visiting[$index] = true;
+            $entry = $schemaEntries[$index];
+
+            foreach ($entry['references'] as $referenceSubject) {
+                if (!isset($subjectIndex[$referenceSubject])) {
+                    $path = $entry['file']->getRealPath() ?: (string) $entry['file'];
+
+                    throw new \RuntimeException(\sprintf('Schema "%s" references unknown subject "%s".', $path, $referenceSubject));
+                }
+
+                $visit($subjectIndex[$referenceSubject]);
+            }
+
+            $visiting[$index] = false;
+            $visited[$index] = true;
+            $order[] = $index;
+        };
+
+        foreach (array_keys($schemaEntries) as $index) {
+            $visit((int) $index);
         }
 
-        $schema = $this->resolveOrParseSchema(
-            $entry['definition'],
-            $entry['file'],
-            $entry['full_name'],
-            $namedSchemata
-        );
-
-        foreach ($entry['subjects'] as $subject) {
-            $schemas[$subject] = $schema;
-        }
-
-        $resolved[$index] = true;
-        unset($resolving[$index]);
+        return $order;
     }
 
     /**

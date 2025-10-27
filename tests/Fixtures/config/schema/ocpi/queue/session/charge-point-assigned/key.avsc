@@ -1,9 +1,9 @@
 {
   "type": "record",
-  "subject": "ocpi.queue.session.position-updated-key",
+  "subject": "ocpi.queue.session.charge-point-assigned-key",
   "namespace": "ocpi.queue.session",
   "name": "QueueSessionKey",
-  "doc": "Key for position updated events, keyed by the OCPI queue session.",
+  "doc": "Key for charge point assignment events, keyed by the OCPI queue session.",
   "fields": [
     {
       "name": "session_id",

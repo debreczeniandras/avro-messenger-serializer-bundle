@@ -212,7 +212,7 @@ When one schema depends on another (for example a nullable union that embeds a s
   "namespace": "ocpi",
   "name": "ChargingLocation",
   "references": [
-    "ocpi.GeoLocation"
+    "ocpi.geo-location"
   ],
   "fields": [
     {
@@ -224,4 +224,4 @@ When one schema depends on another (for example a nullable union that embeds a s
 }
 ```
 
-The bundle uses these hints to load schemas in dependency order so cross-file references work regardless of discovery order. The declared subjects can also be forwarded to `\FlixTech\SchemaRegistryApi\Registry\CachedRegistry::register()` as Avro references to make the relationship explicit in the Confluent Schema Registry.
+The bundle uses these hints to load schemas in dependency order so cross-file references work regardless of discovery order. During message encoding the bundle ensures referenced subjects are registered first, then registers the dependent schema with proper [`AvroReference`](https://docs.confluent.io/platform/current/schema-registry/fundamentals/serdes-develop/index.html#schema-references) metadata so the relationship is visible in the Confluent Schema Registry.

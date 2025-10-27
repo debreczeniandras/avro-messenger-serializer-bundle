@@ -1,0 +1,45 @@
+{
+  "type": "record",
+  "subject": "ocpi.queue.session.charge-point-assigned-value",
+  "namespace": "ocpi.queue.session",
+  "name": "ChargePointAssigned",
+  "doc": "Payload emitted when a queue session receives a charge point assignment.",
+  "references": [
+    "ocpi.geo-location"
+  ],
+  "fields": [
+    {
+      "name": "session_id",
+      "type": "string",
+      "doc": "OCPI queue session identifier (QueueSession::$uid)."
+    },
+    {
+      "name": "timestamp",
+      "type": "string",
+      "doc": "ISO8601 timestamp when the assignment event occurred (DomainEvent::occurredAtIso())."
+    },
+    {
+      "name": "evse_id",
+      "type": "string",
+      "doc": "Assigned EVSE identifier (QueueSession::$assignedEvseId)."
+    },
+    {
+      "name": "physical_reference",
+      "type": "string",
+      "doc": "Operator-specific physical reference for the EVSE (QueueSession::$assignedPhysicalReference)."
+    },
+    {
+      "name": "coordinates",
+      "type": [
+        "null",
+        "ocpi.GeoLocation"
+      ],
+      "default": null
+    },
+    {
+      "name": "authorization_timeout",
+      "type": "int",
+      "doc": "Authorization timeout in seconds after assignment (QueueSession::$authTimeout)."
+    }
+  ]
+}

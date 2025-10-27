@@ -30,9 +30,14 @@ services:
 
   Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Schema\InMemoryRegistry: ~
 
-  Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Messaging\FakeRecordSerializer: ~
+  Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Messaging\FakeRecordSerializer:
+    arguments:
+      $registry: '@Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Schema\InMemoryRegistry'
 
   Chargecloud\AvroMessengerSerializerBundle\Messenger\RecordEncoder:
     arguments:
       $recordSerializer: '@Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Messaging\FakeRecordSerializer'
       $schemaRepository: '@Chargecloud\AvroMessengerSerializerBundle\Schema\SchemaRepository'
+      $schemaRegistry: '@Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Schema\InMemoryRegistry'
+      $registerMissingSchemas: '%chargecloud_avro_messenger_serializer.register_missing_schemas%'
+      $registerMissingSubjects: '%chargecloud_avro_messenger_serializer.register_missing_subjects%'

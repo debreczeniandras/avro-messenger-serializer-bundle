@@ -11,7 +11,7 @@ use FlixTech\SchemaRegistryApi\SynchronousRegistry;
 
 final class InMemoryRegistry implements SynchronousRegistry
 {
-    /** @var array<string, array{schema: \AvroSchema, id: int, version: int}> */
+    /** @var array<string, array{schema: \AvroSchema, id: int, version: int, references: AvroReference[]}> */
     private array $subjects = [];
 
     /** @var array<int, \AvroSchema> */
@@ -24,6 +24,10 @@ final class InMemoryRegistry implements SynchronousRegistry
         $key = $this->makeSchemaKey($schema);
 
         if (isset($this->subjects[$subject]) && $this->makeSchemaKey($this->subjects[$subject]['schema']) === $key) {
+            if (!empty($references)) {
+                $this->subjects[$subject]['references'] = $references;
+            }
+
             return $this->subjects[$subject]['id'];
         }
 
@@ -32,6 +36,7 @@ final class InMemoryRegistry implements SynchronousRegistry
             'schema' => $schema,
             'id' => $id,
             'version' => 1,
+            'references' => $references,
         ];
         $this->schemasById[$id] = $schema;
 
@@ -54,6 +59,14 @@ final class InMemoryRegistry implements SynchronousRegistry
         }
 
         return $this->subjects[$subject]['schema'];
+    }
+
+    /**
+     * @return AvroReference[]
+     */
+    public function referencesFor(string $subject): array
+    {
+        return $this->subjects[$subject]['references'] ?? [];
     }
 
     public function schemaId(string $subject, \AvroSchema $schema): int

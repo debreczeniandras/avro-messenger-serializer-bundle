@@ -3,7 +3,7 @@
   "namespace": "ocpi",
   "name": "ChargingLocation",
   "references": [
-    "ocpi.GeoLocation"
+    "ocpi.geo-location"
   ],
   "fields": [
     { "name": "location_id", "type": "string" },

@@ -1,10 +1,24 @@
 {
   "type": "record",
+  "subject": "ocpi.queue.session.position-updated-value",
   "namespace": "ocpi.queue.session",
   "name": "PositionUpdated",
   "fields": [
-    { "name": "session_id", "type": "string" },
-    { "name": "queue_position", "type": ["int"] },
-    { "name": "estimated_wait_seconds", "type": ["null","int"], "default": null }
+    {
+      "name": "session_id",
+      "type": "string"
+    },
+    {
+      "name": "queue_position",
+      "type": "int"
+    },
+    {
+      "name": "estimated_wait_seconds",
+      "type": [
+        "null",
+        "int"
+      ],
+      "default": null
+    }
   ]
 }
