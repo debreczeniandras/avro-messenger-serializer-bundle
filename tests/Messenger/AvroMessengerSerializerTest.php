@@ -8,10 +8,8 @@ use Chargecloud\AvroMessengerSerializerBundle\Messenger\AvroMessengerSerializer;
 use Chargecloud\AvroMessengerSerializerBundle\Messenger\MessageMetadataRegistry;
 use Chargecloud\AvroMessengerSerializerBundle\Schema\SchemaRepository;
 use Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\AttributeMessage;
-use Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\ChargePointAssignedMessage;
 use Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\ConfiguredMessage;
 use Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Message\PositionUpdatedMessage;
-use Chargecloud\AvroMessengerSerializerBundle\Tests\Fixtures\Schema\InMemoryRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Messenger\Envelope;
 
@@ -20,7 +18,6 @@ final class AvroMessengerSerializerTest extends KernelTestCase
     private AvroMessengerSerializer $serializer;
     private SchemaRepository $schemaRepository;
     private MessageMetadataRegistry $metadataRegistry;
-    private InMemoryRegistry $schemaRegistry;
 
     protected function setUp(): void
     {
@@ -39,10 +36,6 @@ final class AvroMessengerSerializerTest extends KernelTestCase
         $metadataRegistry = $container->get(MessageMetadataRegistry::class);
         self::assertInstanceOf(MessageMetadataRegistry::class, $metadataRegistry);
         $this->metadataRegistry = $metadataRegistry;
-
-        $schemaRegistry = $container->get(InMemoryRegistry::class);
-        self::assertInstanceOf(InMemoryRegistry::class, $schemaRegistry);
-        $this->schemaRegistry = $schemaRegistry;
     }
 
     protected function tearDown(): void
@@ -143,47 +136,5 @@ final class AvroMessengerSerializerTest extends KernelTestCase
 
         self::assertSame($keyPayload, $decodedMessage->avroKeyPayload());
         self::assertSame($valuePayload, $decodedMessage->avroValuePayload());
-    }
-
-    public function testSchemaReferencesRegisteredDuringEncoding(): void
-    {
-        $message = new ChargePointAssignedMessage(
-            ['session_id' => 'session-456'],
-            [
-                'session_id' => 'session-456',
-                'timestamp' => '2024-09-18T12:34:56+00:00',
-                'evse_id' => 'EVSE-1',
-                'physical_reference' => 'PR-1',
-                'coordinates' => [
-                    'latitude' => '52.5200',
-                    'longitude' => '13.4050',
-                ],
-                'authorization_timeout' => 90,
-            ]
-        );
-
-        $envelope = new Envelope($message);
-
-        $encoded = $this->serializer->encode($envelope);
-
-        self::assertSame('ocpi.queue.session.charge-point-assigned-value', $encoded['headers']['x-avro-value-subject'] ?? null);
-        self::assertNotEmpty($encoded['body']);
-
-        $geoSchema = $this->schemaRepository->get('ocpi.geo-location');
-        $geoSchemaId = $this->schemaRegistry->schemaId('ocpi.geo-location', $geoSchema);
-        self::assertGreaterThan(0, $geoSchemaId);
-
-        $references = $this->schemaRegistry->referencesFor('ocpi.queue.session.charge-point-assigned-value');
-        self::assertCount(1, $references);
-
-        $referenceData = $references[0]->jsonSerialize();
-        self::assertSame('ocpi.GeoLocation', $referenceData['name']);
-        self::assertSame('ocpi.geo-location', $referenceData['subject']);
-
-        $decodedEnvelope = $this->serializer->decode($encoded);
-        /** @var ChargePointAssignedMessage $decodedMessage */
-        $decodedMessage = $decodedEnvelope->getMessage();
-
-        self::assertSame($message->avroValuePayload(), $decodedMessage->avroValuePayload());
     }
 }

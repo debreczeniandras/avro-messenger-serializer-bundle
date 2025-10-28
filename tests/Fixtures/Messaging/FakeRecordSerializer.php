@@ -9,9 +9,9 @@ use FlixTech\AvroSerializer\Objects\RecordSerializer;
 
 final class FakeRecordSerializer extends RecordSerializer
 {
-    public function __construct(InMemoryRegistry $registry)
+    public function __construct()
     {
-        parent::__construct($registry, [
+        parent::__construct(new InMemoryRegistry(), [
             self::OPTION_REGISTER_MISSING_SCHEMAS => true,
             self::OPTION_REGISTER_MISSING_SUBJECTS => true,
         ]);

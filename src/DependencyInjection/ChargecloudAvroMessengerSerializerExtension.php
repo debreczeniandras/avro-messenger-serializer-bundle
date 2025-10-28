@@ -106,10 +106,7 @@ final class ChargecloudAvroMessengerSerializerExtension extends Extension
 
         $recordEncoder = (new Definition(RecordEncoder::class))
             ->setArgument('$recordSerializer', new Reference(RecordSerializer::class))
-            ->setArgument('$schemaRepository', new Reference(SchemaRepository::class))
-            ->setArgument('$schemaRegistry', new Reference('chargecloud_avro_messenger_serializer.registry.cached'))
-            ->setArgument('$registerMissingSchemas', '%chargecloud_avro_messenger_serializer.register_missing_schemas%')
-            ->setArgument('$registerMissingSubjects', '%chargecloud_avro_messenger_serializer.register_missing_subjects%');
+            ->setArgument('$schemaRepository', new Reference(SchemaRepository::class));
         $container->setDefinition(RecordEncoder::class, $recordEncoder);
 
         $metadataRegistry = (new Definition(MessageMetadataRegistry::class))

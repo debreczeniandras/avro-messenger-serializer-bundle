@@ -1,22 +1,8 @@
 {
   "type": "record",
-  "subject": "ocpi.queue.session.position-updated-key",
   "namespace": "ocpi.queue.session",
-  "name": "QueueSessionKey",
-  "doc": "Key for position updated events, keyed by the OCPI queue session.",
+  "name": "PositionUpdatedKey",
   "fields": [
-    {
-      "name": "session_id",
-      "type": "string",
-      "doc": "OCPI queue session identifier (maps to QueueSession::$uid)."
-    },
-    {
-      "name": "tenant_id",
-      "type": [
-        "null",
-        "string"
-      ],
-      "default": null
-    }
+    { "name": "session_id", "type": "string" }
   ]
 }

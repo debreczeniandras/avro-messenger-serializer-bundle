@@ -11,26 +11,14 @@ final class SchemaRepository
      */
     private array $schemas;
 
-    /**
-     * @var array<string, string[]>
-     */
-    private array $references = [];
-
-    /**
-     * @var array<string, string>
-     */
-    private array $fullNames = [];
-
     public function __construct(private readonly SchemaLoader $schemaLoader)
     {
-        $this->refresh();
+        $this->schemas = $this->schemaLoader->load();
     }
 
     public function refresh(): void
     {
         $this->schemas = $this->schemaLoader->load();
-        $this->references = $this->schemaLoader->references();
-        $this->fullNames = $this->schemaLoader->fullNames();
     }
 
     public function has(string $subject): bool
@@ -53,18 +41,5 @@ final class SchemaRepository
     public function all(): array
     {
         return $this->schemas;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function references(string $subject): array
-    {
-        return $this->references[$subject] ?? [];
-    }
-
-    public function fullName(string $subject): ?string
-    {
-        return $this->fullNames[$subject] ?? null;
     }
 }
